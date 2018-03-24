@@ -1,0 +1,18 @@
+{
+  "name": "media.events",
+  "version": "1.0.0",
+  "description": "Event Handler",
+  "main": "index.js",
+  "repository": "https://github.com/jaredallard/media-stack",
+  "author": "Jared Allard <jaredallard@outlook.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "debug": "^3.1.0",
+    "express": "^4.16.3",
+    "fs-extra": "^5.0.0",
+    "kue": "^0.11.6",
+    "lodash": "^4.17.5",
+    "trello": "^0.8.0"
+  }
+}
