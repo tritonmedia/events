@@ -9,8 +9,8 @@
 'use strict';
 
 const _        = require('lodash')
-const Config   = require('../helpers/config')
-const dyn      = require('../helpers/dynamics')
+const dyn      = require('triton-core/dynamics')
+const Config   = require('triton-core/config')
 const kue      = require('kue')
 
 const Event    = require('events').EventEmitter;
