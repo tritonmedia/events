@@ -12,6 +12,7 @@ const _        = require('lodash')
 const dyn      = require('triton-core/dynamics')
 const Config   = require('triton-core/config')
 const kue      = require('kue')
+const debug    = require('debug')('media:events')
 
 const Event    = require('events').EventEmitter;
 const event    = new Event()
@@ -23,14 +24,16 @@ const init = async () => {
     redis: dyn('redis')
   })
 
-  console.log('config', config)
+  debug('init', 'starting trello init')
 
   // start the trello listener
-  const events = await trello(config.keys.trello, {
+  await trello(config.keys.trello, {
     callbackUrl: config.instance.webhook,
     board: config.instance.board,
     event: event
   })
+
+  debug('init', 'finished trello init')
 
   // media events
   await require('./event/media')(event, queue, config)
