@@ -16,7 +16,7 @@
   * @param  {Event.EventEmitter} emitter event emitter
   * @param  {Object} queue               Kue queue
   * @param  {Object} config              config
-  * @return {undefined}                  stop
+  * @return {Boolean}                    success
   */
  module.exports = (emitter, queue, config) => {
    const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
