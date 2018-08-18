@@ -6,21 +6,21 @@
  * @version 1
  */
 
-'use strict';
+'use strict'
 
-const _        = require('lodash')
-const dyn      = require('triton-core/dynamics')
-const Config   = require('triton-core/config')
-const kue      = require('kue')
-const debug    = require('debug')('media:events')
+const _ = require('lodash')
+const dyn = require('triton-core/dynamics')
+const Config = require('triton-core/config')
+const kue = require('kue')
+const debug = require('debug')('media:events')
 
-const Event    = require('events').EventEmitter;
-const event    = new Event()
+const Event = require('events').EventEmitter
+const event = new Event()
 
 const init = async () => {
   const config = await Config('events')
   const trello = require('./lib/trello')
-  const queue  = kue.createQueue({
+  const queue = kue.createQueue({
     redis: dyn('redis')
   })
 
