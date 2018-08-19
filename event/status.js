@@ -42,9 +42,9 @@ module.exports = (emitter, queue, config) => {
     const listPointer = lists[status]
     if (listPointer) {
       debug('move-card', listPointer)
-      await trello.makeRequest('put', `/1/cards/${cardId}/idList`, {
-        value: listPointer,
-        pos: 2
+      await trello.makeRequest('put', `/1/cards/${cardId}`, {
+        idList: listPointer,
+        pos: '2'
       })
     }
 
