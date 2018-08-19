@@ -51,7 +51,7 @@ module.exports = (emitter, queue, config) => {
       child.debug('moving card to list')
       await trello.makeRequest('put', `/1/cards/${cardId}`, {
         idList: listPointer,
-        pos: '2'
+        pos: 2
       })
     }
 
