@@ -31,10 +31,8 @@ module.exports = (emitter, queue, config) => {
     const listNow = event.data.listAfter.id
     const listBefore = event.data.listBefore.id
     const cardId = event.data.card.id
-    const cardName = event.data.card.name
 
     const child = logger.child({
-      listAfter,
       listNow,
       listBefore,
       cardId
@@ -61,7 +59,6 @@ module.exports = (emitter, queue, config) => {
     })
 
     if (!download || !source || !mal) {
-      debug('newMedia', download, source, mal)
       return child.error('card was invalid, source / download / mal was not found.')
     }
 
