@@ -8,6 +8,10 @@
 
 const _ = require('lodash')
 const Trello = require('trello')
+const path = require('path')
+const logger = require('pino')({
+  name: path.basename(__filename)
+})
 
 /**
  * Parse Trello events / whatever into stack events.
