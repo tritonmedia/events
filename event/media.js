@@ -7,7 +7,6 @@
  */
 
 const _ = require('lodash')
-const debug = require('debug')('media:events:event:media')
 const Trello = require('trello')
 
 /**
@@ -23,22 +22,29 @@ module.exports = (emitter, queue, config) => {
 
   // Process new media.
   emitter.on('updateCard', async event => {
-    if (!event.data.listAfter) return debug('newMedia', 'not a transfer card')
+    if (!event.data.listAfter) return logger.debug('skiping card that wasn\'t moved')
 
     const listNow = event.data.listAfter.id
     const listBefore = event.data.listBefore.id
     const cardId = event.data.card.id
     const cardName = event.data.card.name
 
+    const child = logger.child({
+      listAfter,
+      listNow,
+      listBefore,
+      cardId
+    })
+
     const metadataLabel = config.instance.labels.metadata
 
     const requestsBoard = config.instance.flow_ids.requests
     const readyBoard = config.instance.flow_ids.ready
 
-    if (listBefore !== requestsBoard) return debug('newMedia', 'origin not requests')
-    if (listNow !== readyBoard) return debug('newMedia', 'dest not ready')
+    if (listBefore !== requestsBoard) return child.debug('skipping card that didnt come from requests list')
+    if (listNow !== readyBoard) return child.debug('skipping card that didnt go to ready')
 
-    debug('newMedia', 'adding new media', `${cardId}/${cardName}`)
+    child.info('creating newMedia event from card')
     const card = await trello.makeRequest('get', `/1/cards/${cardId}`)
     const attachments = await trello.makeRequest('get', `/1/cards/${cardId}/attachments`)
 
@@ -52,14 +58,15 @@ module.exports = (emitter, queue, config) => {
 
     if (!download || !source || !mal) {
       debug('newMedia', download, source, mal)
-      return debug('newMedia', 'missing dl, source, or mal')
+      return child.error('card was invalid, source / download / mal was not found.')
     }
 
-    debug('newMedia', 'add-label', metadataLabel)
+    child.info('adding labels to certify this card is OK')
     await trello.makeRequest('post', `/1/cards/${cardId}/idLabels`, {
       value: metadataLabel
     })
 
+    child.info('creating job')
     queue.create('newMedia', {
       id: cardId,
       card: card,
@@ -70,7 +77,7 @@ module.exports = (emitter, queue, config) => {
         type: 'unknown'
       }
     }).removeOnComplete(true).save(err => {
-      if (err) return debug('newMedia', 'failed to add to queue')
+      if (err) return child.error('failed to save job')
     })
   })
 }

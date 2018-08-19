@@ -8,11 +8,13 @@
 
 'use strict'
 
-const _ = require('lodash')
 const dyn = require('triton-core/dynamics')
 const Config = require('triton-core/config')
 const kue = require('kue')
-const debug = require('debug')('media:events')
+const path = require('path')
+const logger = require('pino')({
+  name: path.basename(__filename)
+})
 
 const Event = require('events').EventEmitter
 const event = new Event()
@@ -24,7 +26,7 @@ const init = async () => {
     redis: dyn('redis')
   })
 
-  debug('init', 'starting trello init')
+  logger.debug('starting trello init')
 
   // start the trello listener
   await trello(config.keys.trello, {
@@ -33,7 +35,7 @@ const init = async () => {
     event: event
   })
 
-  debug('init', 'finished trello init')
+  logger.debug('finished trello init')
 
   // media events
   await require('./event/media')(event, queue, config)

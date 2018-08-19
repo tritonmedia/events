@@ -6,9 +6,11 @@
  * @version 1
  */
 
-const _ = require('lodash')
-const debug = require('debug')('media:events:event:status')
 const Trello = require('trello')
+const path = require('path')
+const logger = require('pino')({
+  name: path.basename(__filename)
+})
 
 /**
   * Parse status updates.
@@ -29,11 +31,16 @@ module.exports = (emitter, queue, config) => {
     const cardId = data.id
     const status = data.status
 
-    debug('status-change', cardId, status)
+    const child = logger.child({
+      cardId,
+      status
+    })
+
+    child.debug('status changed')
 
     const pointer = labels[status]
     if (pointer) {
-      debug('add-label', pointer)
+      child.info('add label to card')
       await trello.makeRequest('post', `/1/cards/${cardId}/idLabels`, {
         value: pointer
       })
@@ -41,7 +48,7 @@ module.exports = (emitter, queue, config) => {
 
     const listPointer = lists[status]
     if (listPointer) {
-      debug('move-card', listPointer)
+      child.debug('moving card to list')
       await trello.makeRequest('put', `/1/cards/${cardId}`, {
         idList: listPointer,
         pos: '2'
