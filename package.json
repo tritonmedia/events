@@ -6,6 +6,9 @@
   "repository": "https://github.com/jaredallard/media-stack",
   "author": "Jared Allard <jaredallard@outlook.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "mocha"
+  },
   "dependencies": {
     "body-parser": "^1.18.2",
     "debug": "^3.1.0",
@@ -23,6 +26,8 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-standard": "^3.1.0"
+    "eslint-plugin-standard": "^3.1.0",
+    "mocha": "^5.2.0",
+    "mocha-eslint": "^4.1.0"
   }
 }
