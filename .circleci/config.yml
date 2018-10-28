@@ -1,6 +1,17 @@
 version: 2
 jobs:
-  build:
+  test:
+    docker:
+      - image: jaredallard/triton-base
+    steps:
+      - checkout
+      - run:
+          name: Run Tests
+          command: |
+            set -e
+            yarn --production=false
+            yarn test
+  build-push:
     docker:
       - image: docker:18.06.1-ce
     steps:
@@ -31,8 +42,11 @@ workflows:
   version: 2
   build-test-push:
     jobs:
-      - build:
+      - test
+      - build-push:
           context: Docker
+          requires:
+            - test
           filters:
             branches:
               only:
