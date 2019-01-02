@@ -18,9 +18,10 @@ const logger = require('pino')({
   * @param  {Event.EventEmitter} emitter event emitter
   * @param  {Object} queue               Kue queue
   * @param  {Object} config              config
+  * @param  {Object} tracer              tracer object
   * @return {Boolean}                    success
   */
-module.exports = (emitter, queue, config) => {
+module.exports = (emitter, queue, config, tracer) => {
   const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
 
   const labels = config.instance.labels

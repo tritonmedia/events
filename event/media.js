@@ -13,24 +13,40 @@ const logger = require('pino')({
   name: path.basename(__filename)
 })
 
+const tracer = require('triton-core/tracer')
+
+/* eslint no-unused-vars: [0] */
+const Event = require('events')
+const { opentracing, Tags, serialize, unserialize } = require('triton-core/tracer')
+
 /**
  * Parse Trello events / whatever into stack events.
  *
  * @param  {Event.EventEmitter} emitter event emitter
  * @param  {Object} queue               Kue queue
  * @param  {Object} config              config
+ * @param  {opentracing.Tracer} tracer  tracer object
  * @return {undefined}                  stop
  */
-module.exports = (emitter, queue, config) => {
+module.exports = (emitter, queue, config, tracer) => {
   const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
 
   // Process new media.
-  emitter.on('updateCard', async event => {
-    if (!event.data.listAfter) return logger.debug('skiping card that wasn\'t moved')
+  emitter.on('updateCard', async (event, rootContext) => {
+    const span = tracer.startSpan('updateCard', {
+      childOf: unserialize(rootContext)
+    })
+
+    if (!event.data.listAfter) {
+      return tracer.error(span, new Error('Card wasn\'t moved'))
+    }
 
     const listNow = event.data.listAfter.id
     const listBefore = event.data.listBefore.id
     const cardId = event.data.card.id
+
+    span.setTag(Tags.CARD_ID, cardId)
+    span.setTag(Tags.LIST_ID, listNow)
 
     const child = logger.child({
       listNow,
@@ -71,6 +87,7 @@ module.exports = (emitter, queue, config) => {
     queue.create('newMedia', {
       id: cardId,
       card: card,
+      rootContext: serialize(span),
       media: {
         source: source.url,
         mal: mal.url,
@@ -78,7 +95,11 @@ module.exports = (emitter, queue, config) => {
         type: 'unknown'
       }
     }).removeOnComplete(true).save(err => {
-      if (err) return child.error('failed to save job')
+      if (err) {
+        return tracer.error(span, new Error('Failed to save job'))
+      }
+
+      return span.finish()
     })
   })
 }
