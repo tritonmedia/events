@@ -17,7 +17,7 @@ const tracer = require('triton-core/tracer')
 
 /* eslint no-unused-vars: [0] */
 const Event = require('events')
-const { opentracing, Tags, serialize, unserialize } = require('triton-core/tracer')
+const { opentracing, Tags, serialize, unserialize, error } = require('triton-core/tracer')
 
 /**
  * Parse Trello events / whatever into stack events.
@@ -38,7 +38,7 @@ module.exports = (emitter, queue, config, tracer) => {
     })
 
     if (!event.data.listAfter) {
-      return tracer.error(span, new Error('Card wasn\'t moved'))
+      return error(span, new Error('Card wasn\'t moved'))
     }
 
     const listNow = event.data.listAfter.id
@@ -96,7 +96,7 @@ module.exports = (emitter, queue, config, tracer) => {
       }
     }).removeOnComplete(true).save(err => {
       if (err) {
-        return tracer.error(span, new Error('Failed to save job'))
+        return error(span, new Error('Failed to save job'))
       }
 
       return span.finish()
