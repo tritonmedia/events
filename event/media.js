@@ -109,7 +109,8 @@ module.exports = async (emitter, config, tracer) => {
 
           // TODO: move download code into here to determine this
           source: 0, // HTTP
-          sourceURI: source.url,
+          // TODO: extract this here
+          sourceURI: card.desc,
           MAL: mal.url
         }
       }
