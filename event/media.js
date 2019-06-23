@@ -115,7 +115,7 @@ module.exports = async (emitter, config, tracer) => {
         }
       }
       const encoded = proto.encode(downloadProto, payload)
-      
+
       await amqp.publish('v1.download', encoded)
     } catch (err) {
       child.error('failed to create job')

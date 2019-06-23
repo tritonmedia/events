@@ -8,7 +8,6 @@
 
 'use strict'
 
-const dyn = require('triton-core/dynamics')
 const Config = require('triton-core/config')
 const Tracer = require('triton-core/tracer').initTracer
 const Event = require('events').EventEmitter

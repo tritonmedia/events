@@ -6,11 +6,11 @@
  * @version 1
  */
 
-const Trello = require('trello')
-const path = require('path')
-const logger = require('pino')({
-  name: path.basename(__filename)
-})
+// const Trello = require('trello')
+// const path = require('path')
+// const logger = require('pino')({
+//   name: path.basename(__filename)
+// })
 
 /**
   * Parse status updates.
@@ -21,10 +21,10 @@ const logger = require('pino')({
   * @return {Boolean}                    success
   */
 module.exports = (emitter, config, tracer) => {
-  const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
+  // const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
 
-  const labels = config.instance.labels
-  const lists = config.instance.flow_ids
+  // const labels = config.instance.labels
+  // const lists = config.instance.flow_ids
 
   // queue.process('status', 100, async container => {
   //   const data = container.data
