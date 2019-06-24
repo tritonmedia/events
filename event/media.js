@@ -12,7 +12,11 @@ const path = require('path')
 const logger = require('pino')({
   name: path.basename(__filename)
 })
+const uuid = require('uuid/v4')
 
+const dyn = require('triton-core/dynamics')
+const AMQP = require('triton-core/amqp')
+const proto = require('triton-core/proto')
 const tracer = require('triton-core/tracer')
 
 /* eslint no-unused-vars: [0] */
@@ -23,13 +27,16 @@ const { opentracing, Tags, serialize, unserialize, error } = require('triton-cor
  * Parse Trello events / whatever into stack events.
  *
  * @param  {Event.EventEmitter} emitter event emitter
- * @param  {Object} queue               Kue queue
  * @param  {Object} config              config
  * @param  {opentracing.Tracer} tracer  tracer object
  * @return {undefined}                  stop
  */
-module.exports = (emitter, queue, config, tracer) => {
+module.exports = async (emitter, config, tracer) => {
   const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
+
+  const amqp = new AMQP(dyn('rabbitmq'))
+  await amqp.connect()
+  const downloadProto = await proto.load('api.Download')
 
   // Process new media.
   emitter.on('updateCard', async (event, rootContext) => {
@@ -83,23 +90,39 @@ module.exports = (emitter, queue, config, tracer) => {
       value: metadataLabel
     })
 
-    child.info('creating job')
-    queue.create('newMedia', {
-      id: cardId,
-      card: card,
-      rootContext: serialize(span),
-      media: {
-        source: source.url,
-        mal: mal.url,
-        download: download,
-        type: 'unknown'
-      }
-    }).removeOnComplete(true).save(err => {
-      if (err) {
-        return error(span, new Error('Failed to save job'))
-      }
+    let cardType = 0 // MOVIE
+    if (!_.find(card.labels, { name: 'Movie' })) {
+      cardType = 1 // TV
+    }
 
-      return span.finish()
-    })
+    child.info('creating job')
+
+    try {
+      const payload = {
+        createdAt: new Date().toISOString(),
+        media: {
+          id: uuid(),
+          name: card.name,
+          creator: 0, // TRELLO
+          creatorId: cardId,
+          type: cardType,
+
+          // TODO: move download code into here to determine this
+          source: 0, // HTTP
+          // TODO: extract this here
+          sourceURI: card.desc,
+          MAL: mal.url
+        }
+      }
+      const encoded = proto.encode(downloadProto, payload)
+
+      await amqp.publish('v1.download', encoded)
+    } catch (err) {
+      child.error('failed to create job')
+      console.log(err)
+    }
+
+    child.info('created job')
+    span.finish()
   })
 }

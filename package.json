@@ -10,24 +10,23 @@
     "test": "mocha"
   },
   "dependencies": {
-    "body-parser": "^1.18.2",
-    "debug": "^3.1.0",
-    "express": "^4.16.3",
-    "fs-extra": "^6.0.1",
-    "kue": "^0.11.6",
-    "lodash": "^4.17.5",
-    "pino": "^5.1.1",
-    "trello": "^0.9.0",
-    "triton-core": "^1.0.0"
+    "body-parser": "^1.19.0",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "fs-extra": "^8.0.1",
+    "lodash": "^4.17.11",
+    "pino": "^5.12.6",
+    "trello": "^0.9.1",
+    "triton-core": "^1.7.0"
   },
   "devDependencies": {
-    "eslint": "^5.4.0",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-standard": "^3.1.0",
-    "mocha": "^5.2.0",
-    "mocha-eslint": "^4.1.0"
+    "eslint": "^6.0.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^6.1.4",
+    "mocha-eslint": "^5.0.0"
   }
 }

@@ -6,56 +6,53 @@
  * @version 1
  */
 
-const Trello = require('trello')
-const path = require('path')
-const logger = require('pino')({
-  name: path.basename(__filename)
-})
+// const Trello = require('trello')
+// const path = require('path')
+// const logger = require('pino')({
+//   name: path.basename(__filename)
+// })
 
 /**
   * Parse status updates.
   *
   * @param  {Event.EventEmitter} emitter event emitter
-  * @param  {Object} queue               Kue queue
   * @param  {Object} config              config
   * @param  {Object} tracer              tracer object
   * @return {Boolean}                    success
   */
-module.exports = (emitter, queue, config, tracer) => {
-  const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
+module.exports = (emitter, config, tracer) => {
+  // const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
 
-  const labels = config.instance.labels
-  const lists = config.instance.flow_ids
+  // const labels = config.instance.labels
+  // const lists = config.instance.flow_ids
 
-  queue.process('status', 100, async (container, next) => {
-    const data = container.data
-    const cardId = data.id
-    const status = data.status
+  // queue.process('status', 100, async container => {
+  //   const data = container.data
+  //   const cardId = data.id
+  //   const status = data.status
 
-    const child = logger.child({
-      cardId,
-      status
-    })
+  //   const child = logger.child({
+  //     cardId,
+  //     status
+  //   })
 
-    child.debug('status changed')
+  //   child.debug('status changed')
 
-    const pointer = labels[status]
-    if (pointer) {
-      child.info('add label to card')
-      await trello.makeRequest('post', `/1/cards/${cardId}/idLabels`, {
-        value: pointer
-      })
-    }
+  //   const pointer = labels[status]
+  //   if (pointer) {
+  //     child.info('add label to card')
+  //     await trello.makeRequest('post', `/1/cards/${cardId}/idLabels`, {
+  //       value: pointer
+  //     })
+  //   }
 
-    const listPointer = lists[status]
-    if (listPointer) {
-      child.debug('moving card to list')
-      await trello.makeRequest('put', `/1/cards/${cardId}`, {
-        idList: listPointer,
-        pos: 2
-      })
-    }
-
-    return next()
-  })
+  //   const listPointer = lists[status]
+  //   if (listPointer) {
+  //     child.debug('moving card to list')
+  //     await trello.makeRequest('put', `/1/cards/${cardId}`, {
+  //       idList: listPointer,
+  //       pos: 2
+  //     })
+  //   }
+  // })
 }
