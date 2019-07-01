@@ -170,7 +170,7 @@ module.exports = async (emitter, config, tracer) => {
         return
       }
 
-      // await amqp.publish('v1.download', encoded)
+      await amqp.publish('v1.download', encoded)
     } catch (err) {
       child.error('failed to create job')
       console.log(err)
