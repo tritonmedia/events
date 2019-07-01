@@ -162,8 +162,9 @@ module.exports = async (emitter, config, tracer) => {
         }
       }
 
+      let encoded
       try {
-        const encoded = await db.new(card.name, 0, cardId, cardType, source, sourceUrl, metadata, metadataId)
+        encoded = await db.new(card.name, 0, cardId, cardType, source, sourceUrl, metadata, metadataId)
       } catch (err) {
         logger.error('failed to create media', err.message)
         logger.error(err.stack)
