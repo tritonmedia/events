@@ -7,10 +7,15 @@
  */
 
 // const Trello = require('trello')
-// const path = require('path')
-// const logger = require('pino')({
-//   name: path.basename(__filename)
-// })
+const path = require('path')
+const logger = require('pino')({
+  name: path.basename(__filename)
+})
+
+const proto = require('triton-core/proto')
+const AMQP = require('triton-core/amqp')
+const dyn = require('triton-core/dynamics')
+const Storage = require('../lib/db')
 
 /**
   * Parse status updates.
@@ -20,7 +25,26 @@
   * @param  {Object} tracer              tracer object
   * @return {Boolean}                    success
   */
-module.exports = (emitter, config, tracer) => {
+module.exports = async (emitter, config, tracer) => {
+  // amqp
+  const amqp = new AMQP(dyn('rabbitmq'), 100)
+  await amqp.connect()
+  
+  // proto
+  const telemStatusProto = await proto.load('api.TelemetryStatus')
+
+  // database
+  const db = new Storage()
+  await db.connect()
+
+  amqp.listen('v1.telemetry.status', async rmsq => {
+    const msg = proto.decode(telemStatusProto, rmqg.message.content)
+
+    logger.info(`processing status update for media ${msg.mediaId}, status: ${msg.status}`)
+
+    await db.updateStatus(msg.mediaId, msg.status)
+  })
+
   // const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
 
   // const labels = config.instance.labels
