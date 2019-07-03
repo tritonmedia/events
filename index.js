@@ -43,11 +43,18 @@ const init = async () => {
   })
 
   // intialize the routes
-  await require('../routes/routes')(app, {
+  await require('./routes/routes')(app, {
     db,
     amqp,
     emitter: event,
     tracer
+  })
+
+  app.use(async (req, res) => {
+    return res.status(404).send({
+      success: false,
+      message: 'Not Found'
+    })
   })
 
   app.listen(process.env.PORT || 3401, () => {
