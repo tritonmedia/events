@@ -29,8 +29,30 @@ const event = new Event()
 const init = async () => {
   const config = await Config('events')
   const trello = require('./lib/trello')
+  const db = new Storage()
+  const amqp = new AMQP(dyn('rabbitmq'))
+  await amqp.connect()
+  await db.connect()
 
-  logger.debug('starting trello init')
+  let app = express()
+  app.use(bodyp.json())
+  app.get('/v1/health', (req, res) => {
+    return res.status(200).send({
+      message: 'healthy'
+    })
+  })
+
+  // intialize the routes
+  await require('../routes/routes')(app, {
+    db,
+    amqp,
+    emitter: event,
+    tracer
+  })
+
+  app.listen(process.env.PORT || 3401, () => {
+    logger.info('api is listening on port', process.env.PORT || 3401)
+  })
 
   // start the trello listener
   if (!process.env.NO_TRELLO) {
@@ -43,34 +65,6 @@ const init = async () => {
   } else {
     logger.info('running with trello support disabled')
   }
-
-  let app = express()
-
-  app.use(bodyp.json())
-
-  app.get('/v1/health', (req, res) => {
-    return res.status(200).send({
-      message: 'healthy'
-    })
-  })
-
-  const db = new Storage()
-  await db.connect()
-
-  const amqp = new AMQP(dyn('rabbitmq'))
-  await amqp.connect()
-
-  // start the routes
-  await require('../routes/routes')(app, {
-    db,
-    amqp,
-    emitter: event,
-    tracer
-  })
-
-  app.listen(process.env.PORT || 3401, () => {
-    logger.info('webhook is listening on port', process.env.PORT || 3401)
-  })
 
   // media events
   await require('./event/media')(event, config, tracer)
