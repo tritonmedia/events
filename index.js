@@ -32,6 +32,9 @@ const init = async () => {
     tracer
   })
 
+  // create routes
+  await require('./lib/router')(event, tracer)
+
   logger.debug('finished trello init')
 
   // media events
