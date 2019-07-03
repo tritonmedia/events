@@ -25,12 +25,16 @@ const init = async () => {
   logger.debug('starting trello init')
 
   // start the trello listener
-  await trello(config.keys.trello, {
-    callbackUrl: config.instance.webhook,
-    board: config.instance.board,
-    event,
-    tracer
-  })
+  if (!process.env.NO_TRELLO) {
+    await trello(config.keys.trello, {
+      callbackUrl: config.instance.webhook,
+      board: config.instance.board,
+      event,
+      tracer
+    })
+  } else {
+    logger.info('running with trello support disabled')
+  }
 
   // create routes
   await require('./lib/router')(event, tracer)
