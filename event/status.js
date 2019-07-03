@@ -29,7 +29,7 @@ module.exports = async (emitter, config, tracer) => {
   // amqp
   const amqp = new AMQP(dyn('rabbitmq'), 100)
   await amqp.connect()
-  
+
   // proto
   const telemStatusProto = await proto.load('api.TelemetryStatus')
 
@@ -37,8 +37,8 @@ module.exports = async (emitter, config, tracer) => {
   const db = new Storage()
   await db.connect()
 
-  amqp.listen('v1.telemetry.status', async rmsq => {
-    const msg = proto.decode(telemStatusProto, rmqg.message.content)
+  amqp.listen('v1.telemetry.status', async rmsg => {
+    const msg = proto.decode(telemStatusProto, rmsg.message.content)
 
     logger.info(`processing status update for media ${msg.mediaId}, status: ${msg.status}`)
 
