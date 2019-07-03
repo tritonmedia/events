@@ -2142,9 +2142,9 @@ semver@4.3.2:
   integrity sha1-x6BxWKgL7dBSNVt3DYLWZA+AO+c=
 
 semver@^6.1.0:
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-6.1.2.tgz#079960381376a3db62eb2edc8a3bfb10c7cfe318"
-  integrity sha512-z4PqiCpomGtWj8633oeAdXm1Kn1W++3T8epkZYnwiVgIYIJ0QHszhInYSJTYxebByQH7KVCEAn8R9duzZW2PhQ==
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-6.2.0.tgz#4d813d9590aaf8a9192693d6c85b9344de5901db"
+  integrity sha512-jdFC1VdUGT/2Scgbimf7FSx9iJLXoqfglSF+gJeuNWVpiE37OIbc1jywR/GJyFdz3mnkz2/id0L0J/cr0izR5A==
 
 send@0.17.1:
   version "0.17.1"
@@ -2418,9 +2418,9 @@ trello@^0.9.1:
     restler "~3.3.0"
 
 triton-core@^1.7.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/triton-core/-/triton-core-1.8.0.tgz#bb2f2f9a4967393c50b4b9897a8b2e50dde327eb"
-  integrity sha512-pC5Ma/1ogiXcg7GAG5UtSIQEN/46NFgXV3PUZtAV3qocaOTu7exAjNqeXo6O02uDVGLZpng/9+pgsxM25DeY6w==
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/triton-core/-/triton-core-1.9.0.tgz#4c6730ba413c277d9b6ec2d6648b571d4d569e0b"
+  integrity sha512-ieHWZ/hJSlwIxZ9ltVXZ6hfdLO2rHsV3rMd1/TFtKEDURg/R9wRGDJrxOBWeryxgVmVYjpUl9reVjc0wRCC8oA==
   dependencies:
     amqp-connection-manager "^2.3.2"
     amqplib "^0.5.3"
