@@ -45,11 +45,13 @@ module.exports = async (emitter, config, tracer) => {
     await db.updateStatus(msg.mediaId, msg.status)
 
     if (process.env.NO_TRELLO) {
-      return
+      return rmsg.ack()
     }
 
     // TODO: actually update the card here
     logger.info('updating trello card')
+
+    rmsg.ack()
   })
 
   // const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
