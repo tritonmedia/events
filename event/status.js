@@ -11,6 +11,7 @@ const path = require('path')
 const logger = require('pino')({
   name: path.basename(__filename)
 })
+const Trello = require('trello')
 
 const proto = require('triton-core/proto')
 const AMQP = require('triton-core/amqp')
@@ -37,55 +38,60 @@ module.exports = async (emitter, config, tracer) => {
   const db = new Storage()
   await db.connect()
 
+  const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
+  const lists = config.instance.flow_ids
+
   amqp.listen('v1.telemetry.status', async rmsg => {
     const msg = proto.decode(telemStatusProto, rmsg.message.content)
+    const { mediaId, status } = msg
 
-    logger.info(`processing status update for media ${msg.mediaId}, status: ${msg.status}`)
+    logger.info(`processing status update for media ${mediaId}, status: ${status}`)
 
-    await db.updateStatus(msg.mediaId, msg.status)
+    await db.updateStatus(mediaId, status)
 
     if (process.env.NO_TRELLO) {
       return rmsg.ack()
     }
 
-    // TODO: actually update the card here
-    logger.info('updating trello card')
+    let statusText
+    switch (status) {
+      case 0:
+        statusText = 'QUEUED'
+        break
+      case 1:
+        statusText = 'DOWNLOADING'
+        break
+      case 2:
+        statusText = 'CONVERTING'
+        break
+      case 3:
+        statusText = 'UPLOADING'
+        break
+      case 4:
+        statusText = 'DEPLOYED'
+        break
+      case 5:
+        statusText = 'ERRORED'
+        break
+    }
+
+    const media = await db.getByID(mediaId)
+
+    if (media.creator !== 0) {
+      return logger.warn('skipping Trello update for non-trello media', mediaId)
+    }
+
+    const listPointer = lists[statusText.toLowerCase()]
+    if (listPointer) {
+      logger.info(`moving media card ${mediaId} (card id ${media.creatorId})`)
+      await trello.makeRequest('put', `/1/cards/${media.creatorId}`, {
+        idList: listPointer,
+        pos: 2
+      })
+    } else {
+      logger.warn('unable to find list for status', status)
+    }
 
     rmsg.ack()
   })
-
-  // const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
-
-  // const labels = config.instance.labels
-  // const lists = config.instance.flow_ids
-
-  // queue.process('status', 100, async container => {
-  //   const data = container.data
-  //   const cardId = data.id
-  //   const status = data.status
-
-  //   const child = logger.child({
-  //     cardId,
-  //     status
-  //   })
-
-  //   child.debug('status changed')
-
-  //   const pointer = labels[status]
-  //   if (pointer) {
-  //     child.info('add label to card')
-  //     await trello.makeRequest('post', `/1/cards/${cardId}/idLabels`, {
-  //       value: pointer
-  //     })
-  //   }
-
-  //   const listPointer = lists[status]
-  //   if (listPointer) {
-  //     child.debug('moving card to list')
-  //     await trello.makeRequest('put', `/1/cards/${cardId}`, {
-  //       idList: listPointer,
-  //       pos: 2
-  //     })
-  //   }
-  // })
 }
