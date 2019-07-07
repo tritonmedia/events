@@ -13,6 +13,23 @@ module.exports = async (app, opts) => {
 
   const mediaProto = await proto.load('api.Media')
 
+  app.get('/', async (req, res) => {
+    let media
+    try {
+      media = await db.list()
+    } catch (err) {
+      return res.status(500).send({
+        success: false,
+        message: 'Internal Server Error'
+      })
+    }
+
+    return res.send({
+      success: true,
+      data: media
+    })
+  })
+
   // get media by id
   app.get('/:id', async (req, res) => {
     try {
