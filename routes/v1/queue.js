@@ -27,6 +27,7 @@ module.exports = async (app, opts) => {
 
     try {
       await db.updateStatus(id, 0)
+      await db.setConverterStatus(id, 0)
 
       const obj = await db.getByID(id)
       const payload = {
