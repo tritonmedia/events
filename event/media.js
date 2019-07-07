@@ -15,8 +15,7 @@ const logger = require('pino')({
 const uuid = require('uuid/v4')
 const url = require('url')
 
-const Storage = require('../lib/db.js')
-
+const Storage = require('triton-core/db')
 const dyn = require('triton-core/dynamics')
 const AMQP = require('triton-core/amqp')
 const proto = require('triton-core/proto')

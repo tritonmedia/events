@@ -100,9 +100,9 @@ acorn@^6.0.7:
   integrity sha512-8oe72N3WPMjA+2zVG71Ia0nXZ8DpQH+QyyHO+p06jT8eg8FGG3FbcUIi8KziHlAfheJQZeoqbvq1mQSQHXKYLw==
 
 ajv@^6.10.0, ajv@^6.9.1:
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.10.0.tgz#90d0d54439da587cd7e843bfb7045f50bd22bdf1"
-  integrity sha512-nffhOpkymDECQyR0mnsUtoCE8RlX38G0rYP+wgLWFyZuUyuuojSSvi/+euOiQBIn63whYwYVIIH1TvE3tu4OEg==
+  version "6.10.1"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.10.1.tgz#ebf8d3af22552df9dd049bfbe50cc2390e823593"
+  integrity sha512-w1YQaVGNC6t2UCPjEawK/vo/dG8OOrVtUmhBT1uJJYxbl5kU2Tj3v6LGqBcsysN1yhuCStJCCA3GqdvKY8sqXQ==
   dependencies:
     fast-deep-equal "^2.0.1"
     fast-json-stable-stringify "^2.0.0"
@@ -2404,9 +2404,9 @@ trello@^0.9.1:
     restler "~3.3.0"
 
 triton-core@^1.10.1:
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/triton-core/-/triton-core-1.10.1.tgz#9ba1fd83d8c0811d0ceb29004ec78585a29e81ff"
-  integrity sha512-VJZgVATh1gxF73DIKcNG/3cirAvRTYqeqmbqqRFypzkpQxJVUAK+PcAHnKZN/8unJAlX4z/Xj/ql/lo5/idkLg==
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/triton-core/-/triton-core-1.11.0.tgz#6753db4552b9a504d1250e49588fee5ca53be47a"
+  integrity sha512-gZ+kBdAbU4AYg9oTocg/UOMuKdof1dtPD6lYr12OXyZtTG7Pl1EI0AGUUXmEkFH8wySrk4Vk2679fEb+HVfevQ==
   dependencies:
     amqp-connection-manager "^3.0.0"
     amqplib "^0.5.3"
@@ -2417,6 +2417,7 @@ triton-core@^1.10.1:
     lodash "^4.17.11"
     minio "^7.0.10"
     opentracing "^0.14.3"
+    pg "^7.11.0"
     pino "^5.12.6"
     protobufjs "^6.8.8"
 

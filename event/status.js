@@ -16,7 +16,7 @@ const Trello = require('trello')
 const proto = require('triton-core/proto')
 const AMQP = require('triton-core/amqp')
 const dyn = require('triton-core/dynamics')
-const Storage = require('../lib/db')
+const Storage = require('triton-core/db')
 
 /**
   * Parse status updates.

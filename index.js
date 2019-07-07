@@ -20,8 +20,7 @@ const AMQP = require('triton-core/amqp')
 const dyn = require('triton-core/dynamics')
 const Config = require('triton-core/config')
 const Tracer = require('triton-core/tracer').initTracer
-
-const Storage = require('./lib/db')
+const Storage = require('triton-core/db')
 
 const tracer = Tracer('events', logger)
 const event = new Event()
