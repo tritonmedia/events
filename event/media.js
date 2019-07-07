@@ -92,6 +92,7 @@ module.exports = async (emitter, config, tracer) => {
 
     // no download, no source, no mal or imdb, mal and imdb
     if (!download || !source || (!mal && !imdb) || (mal && imdb)) {
+      child.warn(download, source, mal, imdb)
       return child.error('card was invalid')
     }
 

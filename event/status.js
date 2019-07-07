@@ -89,7 +89,7 @@ module.exports = async (emitter, config, tracer) => {
         pos: 2
       })
     } else {
-      logger.warn('unable to find list for status', status)
+      logger.warn('unable to find list for status', status, `(${statusText})`, `avail ([${Object.keys(lists)}])`)
     }
 
     rmsg.ack()
