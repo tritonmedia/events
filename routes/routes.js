@@ -12,12 +12,15 @@ const logger = require('pino')({
   name: path.basename(__filename)
 })
 
+const auth = require('../lib/authentication')
+
 /**
  * Registers routes
  * @param {express.Application} app express app instance
  * @param {Object} opts options instance
  */
 const registerRoutes = async (app, opts) => {
+  const a = auth(opts.db)
   const entries = await fs.readdir(__dirname)
 
   const versions = []
@@ -34,6 +37,9 @@ const registerRoutes = async (app, opts) => {
 
     standaloneRoutes.push(entry)
   }
+
+  // require authentication
+  app.use(a.requireAuthentication)
 
   // process versioned routes
   for (const version of versions) {

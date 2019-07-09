@@ -21,6 +21,7 @@ const dyn = require('triton-core/dynamics')
 const Config = require('triton-core/config')
 const Tracer = require('triton-core/tracer').initTracer
 const Storage = require('triton-core/db')
+const Auth = require('./lib/authentication')
 
 const tracer = Tracer('events', logger)
 const event = new Event()
@@ -40,6 +41,14 @@ const init = async () => {
       message: 'healthy'
     })
   })
+
+  const keys = await db.listTokens()
+  if (keys.length === 0) {
+    const auth = Auth(db)
+    const token = await auth.generateAPIToken()
+
+    logger.info('generated initial API token:', token)
+  }
 
   // intialize the routes
   await require('./routes/routes')(app, {
