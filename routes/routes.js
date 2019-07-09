@@ -38,9 +38,6 @@ const registerRoutes = async (app, opts) => {
     standaloneRoutes.push(entry)
   }
 
-  // require authentication
-  app.use(a.requireAuthentication)
-
   // process versioned routes
   for (const version of versions) {
     logger.info('registered version', version, 'in routes')
@@ -48,6 +45,9 @@ const registerRoutes = async (app, opts) => {
     const versionRouter = new express.Router()
     const versionBase = `/${version}`
     const routes = await fs.readdir(path.join(__dirname, version))
+
+    // require authentication
+    versionBase.use(a.requireAuthentication)
 
     for (const route of routes) {
       const router = new express.Router()
