@@ -47,7 +47,7 @@ const registerRoutes = async (app, opts) => {
     const routes = await fs.readdir(path.join(__dirname, version))
 
     // require authentication
-    versionBase.use(a.requireAuthentication)
+    versionRouter.use(a.requireAuthentication)
 
     for (const route of routes) {
       const router = new express.Router()
