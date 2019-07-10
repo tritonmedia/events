@@ -6,9 +6,16 @@ This doc contains API documentation
 
 For integer response for "source", "type", and etc, you should refer to the protobufs located [here](https://github.com/tritonmedia/core/tree/master/protos/api) for their string representations.
 
+## Authentication
+
+All routes are authenticated. A API token is created on first init and printed to stdout, it can be found in
+the `tokens` table.
+
+A token should be supplied in the `Authorization` header.
+
 ## /v1/media
 
-## GET /v1/media - List all Media
+### GET /v1/media - List all Media
 
 **Endpoint**: GET - https://app.tritonjs.com/v1/media
 
@@ -38,7 +45,7 @@ For integer response for "source", "type", and etc, you should refer to the prot
 ```
 
 
-## POST /v1/media - Create New Media
+### POST /v1/media - Create New Media
 
 **Endpoint**: POST - https://app.tritonjs.com/v1/media
 
@@ -80,7 +87,7 @@ For integer response for "source", "type", and etc, you should refer to the prot
 }
 ```
 
-## Get Media
+### Get Media
 
 **Endpoint**: GET - https://app.tritonjs.com/v1/media/:id
 
@@ -106,6 +113,8 @@ For integer response for "source", "type", and etc, you should refer to the prot
 }
 ```
 
+## /v1/queue
+
 ## Requeue Media
 
 **Endpoint**: POST - https://app.tritonjs.com/v1/queue/:id
@@ -129,5 +138,22 @@ For integer response for "source", "type", and etc, you should refer to the prot
 		"metadataId": "24833",
 		"status": 4 // DEPLOYED
 	}
+}
+```
+
+## /v1/token
+
+## Create a new Token
+
+**Endpoint**: POST - https://app.tritonjs.com/v1/token
+
+**Description**: Creates a new API token
+
+#### Response
+
+```json
+{
+	"success": true,
+	"data": ":128-token"
 }
 ```
