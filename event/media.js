@@ -126,6 +126,9 @@ module.exports = async (emitter, config, tracer) => {
         case 'file':
           source = 2
           break
+        case 'bucket':
+          source = 3
+          break
       }
 
       let metadata
