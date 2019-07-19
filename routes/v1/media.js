@@ -6,12 +6,28 @@ const path = require('path')
 const logger = require('pino')({
   name: path.basename(__filename)
 })
+const _ = require('lodash')
 const proto = require('triton-core/proto')
 
 module.exports = async (app, opts) => {
   const { db, amqp } = opts
 
   const mediaProto = await proto.load('api.Media')
+  const apiProto = await proto.load('api.TelemetryError')
+
+  /**
+   * Mutates a media object to have string enum types
+   * @param {Object} media media object from the data
+   */
+  const mediaTransformer = media => {
+    return _.merge(media, {
+      creator: proto.enumToString(mediaProto, 'CreatorType', media.creator),
+      type: proto.enumToString(mediaProto, 'MediaType', media.creator),
+      source: proto.enumToString(mediaProto, 'SourceType', media.creator),
+      metadata: proto.enumToString(mediaProto, 'MetadataType', media.creator),
+      status: proto.enumToString(apiProto, 'TelemetryStatusEntry', media.creator)
+    })
+  }
 
   app.get('/', async (req, res) => {
     let media
@@ -24,9 +40,11 @@ module.exports = async (app, opts) => {
       })
     }
 
+    const formattedMedia = _.map(media, mediaTransformer)
+
     return res.send({
       success: true,
-      data: media
+      data: formattedMedia
     })
   })
 
@@ -42,7 +60,7 @@ module.exports = async (app, opts) => {
       }
 
       const obj = await db.getByID(req.params['id'])
-      return res.send(obj)
+      return res.send(mediaTransformer(obj))
     } catch (err) {
       logger.error('failed to get media', err.message || err)
       logger.error(err.stack)
