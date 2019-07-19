@@ -25,6 +25,42 @@ const tracer = require('triton-core/tracer')
 const Event = require('events')
 const { opentracing, Tags, serialize, unserialize, error } = require('triton-core/tracer')
 
+const metadataTransformers = {
+  IMDB: data => {
+    if (data[0] === 't') { // ids look like tt21313
+      return data
+    } else {
+      const imdbUrl = new url.URL(data)
+      const pathSplit = imdbUrl.pathname.split('/', 3)
+      return pathSplit[2]
+    }
+  },
+  MAL: data => {
+    let metadataId
+    let id = parseInt(data, 10)
+    if (isNaN(id)) {
+      // attempt to parse it as a URL
+      const malUrl = new url.URL(data)
+      const pathSplit = malUrl.pathname.split('/', 3)
+      id = parseInt(pathSplit[2], 10)
+    }
+
+    metadataId = id.toString(10)
+  },
+  KITSU: data => {
+    let metadataId
+    let id = parseInt(data, 10)
+    if (isNaN(id)) {
+      // attempt to parse it as a URL
+      const malUrl = new url.URL(data)
+      const pathSplit = malUrl.pathname.split('/', 3)
+      id = parseInt(pathSplit[2], 10)
+    }
+
+    metadataId = id.toString(10)
+  }
+}
+
 /**
  * Parse Trello events / whatever into stack events.
  *
@@ -41,6 +77,8 @@ module.exports = async (emitter, config, tracer) => {
 
   const db = new Storage()
   await db.connect()
+
+  const mediaProto = await proto.load('api.Media')
 
   // Process new media.
   emitter.on('updateCard', async (event, rootContext) => {
@@ -82,17 +120,40 @@ module.exports = async (emitter, config, tracer) => {
       name: 'SOURCE'
     })
 
-    const mal = _.find(attachments, {
-      name: 'MAL'
-    })
+    const metadataTypes = proto.enumValues(mediaProto, 'MetadataType')
+    logger.info('possible metadata types:', metadataTypes.join(','))
 
-    const imdb = _.find(attachments, {
-      name: 'IMDB'
-    })
+    let metadata, metadataId
 
-    // no download, no source, no mal or imdb, mal and imdb
-    if (!download || !source || (!mal && !imdb) || (mal && imdb)) {
-      child.warn(download, source, mal, imdb)
+    // TODO(jaredallard): move away from attachments and use custom fields or something else
+    for (const metadataProvider of metadataTypes) {
+      const attachment = _.find(attachments, {
+        name: metadataProvider
+      })
+
+      if (!attachment) continue
+
+      metadata = proto.stringToEnum(mediaProto, 'MetadataType', metadataProvider)
+      metadataId = attachment.url
+
+      // transform it if we have an available transformer
+      if (metadataTransformers[metadataProvider]) {
+        metadataId = metadataTransformers[metadataProvider](attachment.url)
+      }
+
+      // we only support one metadata provider
+      break
+    }
+
+    if (!metadataId) {
+      return child.error('No metadata found.')
+    }
+
+    logger.info(`card is using metadata provider ${proto.enumToString(mediaProto, 'MetadataType', metadata)}, ID ${metadataId}`)
+
+    // no download, no source
+    if (!download || !source) {
+      child.warn(download, source)
       return child.error('card was invalid')
     }
 
@@ -115,55 +176,10 @@ module.exports = async (emitter, config, tracer) => {
       // normalize https
       if (sourceProtocol === 'https') sourceProtocol = 'http'
 
-      let source
-      switch (sourceProtocol) {
-        case 'http':
-          source = 0
-          break
-        case 'magnet':
-          source = 1
-          break
-        case 'file':
-          source = 2
-          break
-        case 'bucket':
-          source = 3
-          break
-      }
+      // SourceType is the source enum, we uppercase the value to match what we expect
+      const source = proto.stringToEnum(mediaProto, 'SourceType', sourceProtocol.toUpperCase())
 
-      let metadata
-      let metadataId
-      if (mal) {
-        metadata = 0
-        const data = mal.url
-        let id = parseInt(data, 10)
-        if (isNaN(id)) {
-          // attempt to parse it as a URL
-          const malUrl = new url.URL(data)
-          const pathSplit = malUrl.pathname.split('/', 3)
-          child.info(malUrl.pathname)
-          id = parseInt(pathSplit[2], 10)
-          if (isNaN(id)) {
-            return child.error('invalid MAL url')
-          }
-        }
-
-        metadataId = id.toString(10)
-      } else if (imdb) {
-        metadata = 1
-        const data = imdb.url
-        if (data[0] === 't') { // ids look like tt21313
-          metadataId = data
-        } else {
-          const imdbUrl = new url.URL(data)
-          const pathSplit = imdbUrl.pathname.split('/', 3)
-          metadataId = pathSplit[2]
-
-          if (metadataId[0] !== 't') {
-            return child.error('invalid IMDB url')
-          }
-        }
-      }
+      logger.info(`source value '${sourceProtocol}' = '${source}'`)
 
       let encoded
       try {

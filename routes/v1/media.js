@@ -61,8 +61,7 @@ module.exports = async (app, opts) => {
     }
   })
 
-  // TODO: Make this authenticated
-  // TODO: Add a rate limit
+  // TODO(jaredallard): Add a rate limit
   app.post('/', async (req, res) => {
     const error = (status = 400, msg = 'Internal Server Error') => {
       return res.status(status).send({
@@ -71,7 +70,45 @@ module.exports = async (app, opts) => {
       })
     }
 
-    const { name, creator, creatorId, type, source, sourceURI, metadata, metadataId } = req.body
+    let { name, creator, creatorId, type, source, sourceURI, metadata, metadataId } = req.body
+
+    // TODO(jaredallard): make these less copypasta
+    if (typeof creator === 'string') {
+      creator = creator.toUpperCase()
+
+      try {
+        creator = proto.stringToEnum(mediaProto, 'CreatorType', creator)
+      } catch (err) {
+        return error(400, `Creator '${creator}' not found.`)
+      }
+    }
+
+    if (typeof type === 'string') {
+      type = type.toUpperCase()
+      try {
+        type = proto.stringToEnum(mediaProto, 'MediaType', type)
+      } catch (err) {
+        return error(400, `Media Type '${type}' isn't supported.`)
+      }
+    }
+
+    if (typeof source === 'string') {
+      source = source.toUpperCase()
+      try {
+        source = proto.stringToEnum(mediaProto, 'SourceType', source)
+      } catch (err) {
+        return error(400, `Source '${source}' isn't supported.`)
+      }
+    }
+
+    if (typeof metadata === 'string') {
+      metadata = metadata.toUpperCase()
+      try {
+        metadata = proto.stringToEnum(mediaProto, 'MetadataType', metadata)
+      } catch (err) {
+        return error(400, `Metadata '${metadata}' isn't supported.`)
+      }
+    }
 
     if (creator === 0) {
       return error(400, 'Trello type is not supported over this endpoint.')
@@ -89,6 +126,7 @@ module.exports = async (app, opts) => {
       metadataId,
       status: 0
     }
+
     try {
       await proto.encode(mediaProto, validationMessage)
     } catch (err) {
@@ -114,7 +152,9 @@ module.exports = async (app, opts) => {
       return error()
     }
 
-    const data = await proto.decode(db.downloadProto, encoded)
+    const data = await proto.decode(db.downloadProto, encoded, {
+      enums: String
+    })
 
     return res.send({
       success: true,
