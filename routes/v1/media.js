@@ -25,7 +25,7 @@ module.exports = async (app, opts) => {
       type: proto.enumToString(mediaProto, 'MediaType', media.creator),
       source: proto.enumToString(mediaProto, 'SourceType', media.creator),
       metadata: proto.enumToString(mediaProto, 'MetadataType', media.creator),
-      status: proto.enumToString(apiProto, 'TelemetryStatusEntry', media.creator)
+      status: proto.enumToString(apiProto, 'TelemetryStatusEntry', media.status)
     })
   }
 
