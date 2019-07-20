@@ -60,7 +60,10 @@ module.exports = async (app, opts) => {
       }
 
       const obj = await db.getByID(req.params['id'])
-      return res.send(mediaTransformer(obj))
+      return res.send({
+        success: true,
+        data: mediaTransformer(obj)
+      })
     } catch (err) {
       logger.error('failed to get media', err.message || err)
       logger.error(err.stack)

@@ -38,7 +38,10 @@ module.exports = async (app, opts) => {
       logger.info('creating new v1.download message for', id)
       const encoded = proto.encode(downloadProto, payload)
       await amqp.publish('v1.download', encoded)
-      return res.send(obj)
+      return res.send({
+        success: true,
+        data: obj
+      })
     } catch (err) {
       logger.error('failed to requeue', err.message || err)
       logger.error(err.stack)
