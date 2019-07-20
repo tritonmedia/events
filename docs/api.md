@@ -4,7 +4,7 @@ This doc contains API documentation
 
 ## Important Information
 
-For integer response for "source", "type", and etc, you should refer to the protobufs located [here](https://github.com/tritonmedia/core/tree/master/protos/api) for their string representations.
+For integer response for "source", "type", and etc, you should refer to the protobufs located [here](https://github.com/tritonmedia/core/tree/master/protos/api) for their string representations. The API endpoints support using both integer and string representations.
 
 ## Authentication
 
@@ -25,19 +25,22 @@ A token should be supplied in the `Authorization` header.
 
 ```json
 {
-  "success": true,
+  "metadata": {
+		"success": true,
+		"host": "host-that-processed-this"
+	},
   "data": [
     {
       "id": "ef8824d6-4c83-4e3f-8a2c-4447d7babf3c",
       "name": "My Media",
-      "creator": 0, // TRELLO
+      "creator": "TRELLO",
       "creatorId": "5a6824e971636a279de0a93e",
-      "type": 1, // TV
-      "source": 1, // MAGNET
+      "type": "TV",
+      "source": "MAGNET",
       "sourceURI": "....",
-      "metadata": 0, // MyAnimeList (1 is IMDB)
+      "metadata": "MAL",
       "metadataId": "24833",
-      "status": 4 // DEPLOYED
+      "status": "DEPLOYED"
     },
 		...
   ]
@@ -57,13 +60,13 @@ A token should be supplied in the `Authorization` header.
 
 ```json
 {
-	"source": 2,
+	"source": "FILE", // or 2
 	"sourceURI": "file:///tmp/Bunny.mkv",
 	"metadataId": "tt5311514",
-	"type": 0,
-	"creator": 1,
+	"type": "MOVIE", // or 1
+	"creator": "API", // or 5
 	"name": "Test Card",
-	"metadata": 0
+	"metadata": "MAL" // or 1
 }
 ```
 
@@ -71,18 +74,21 @@ A token should be supplied in the `Authorization` header.
 
 ```json
 {
-	"success": true,
+  "metadata": {
+		"success": true,
+		"host": "host-that-processed-this"
+	},
 	"data": {
 		"id": "ef8824d6-4c83-4e3f-8a2c-4447d7babf3c",
 		"name": "My Media",
-		"creator": 0, // TRELLO
+		"creator": "TRELLO",
 		"creatorId": "5a6824e971636a279de0a93e",
-		"type": 1, // TV
-		"source": 1, // MAGNET
+		"type": "TV",
+		"source": "MAGNET",
 		"sourceURI": "....",
-		"metadata": 0, // MyAnimeList (1 is IMDB)
+		"metadata": "MAL", // MyAnimeList
 		"metadataId": "24833",
-		"status": 4 // DEPLOYED
+		"status": "DEPLOYED"
 	}
 }
 ```
@@ -97,18 +103,21 @@ A token should be supplied in the `Authorization` header.
 
 ```json
 {
-	"success": true,
+  "metadata": {
+		"success": true,
+		"host": "host-that-processed-this"
+	},
 	"data": {
 		"id": "ef8824d6-4c83-4e3f-8a2c-4447d7babf3c",
 		"name": "My Media",
-		"creator": 0, // TRELLO
+		"creator": "TRELLO",
 		"creatorId": "5a6824e971636a279de0a93e",
-		"type": 1, // TV
-		"source": 1, // MAGNET
+		"type": "TV",
+		"source": "MAGNET",
 		"sourceURI": "....",
-		"metadata": 0, // MyAnimeList (1 is IMDB)
+		"metadata": "METADATA",
 		"metadataId": "24833",
-		"status": 4 // DEPLOYED
+		"status": "DEPLOYED"
 	}
 }
 ```
@@ -125,18 +134,21 @@ A token should be supplied in the `Authorization` header.
 
 ```json
 {
-	"success": true,
+  "metadata": {
+		"success": true,
+		"host": "host-that-processed-this"
+	},
 	"data": {
 		"id": "ef8824d6-4c83-4e3f-8a2c-4447d7babf3c",
 		"name": "My Media",
-		"creator": 0, // TRELLO
+		"creator": "TRELLO",
 		"creatorId": "5a6824e971636a279de0a93e",
-		"type": 1, // TV
-		"source": 1, // MAGNET
+		"type": "TV",
+		"source": "MAGNET",
 		"sourceURI": "....",
-		"metadata": 0, // MyAnimeList (1 is IMDB)
+		"metadata": "MAL",
 		"metadataId": "24833",
-		"status": 4 // DEPLOYED
+		"status": "DEPLOYED"
 	}
 }
 ```
@@ -153,7 +165,10 @@ A token should be supplied in the `Authorization` header.
 
 ```json
 {
-	"success": true,
+  "metadata": {
+		"success": true,
+		"host": "host-that-processed-this"
+	},
 	"data": ":128-token"
 }
 ```
