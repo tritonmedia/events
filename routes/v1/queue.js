@@ -19,10 +19,7 @@ module.exports = async (app, opts) => {
   app.post('/:id', async (req, res) => {
     const id = req.params.id
     if (!id) {
-      return res.status(400).send({
-        success: false,
-        message: 'Missing id in query'
-      })
+      return res.error('Missing ID in path /:id.')
     }
 
     try {
@@ -38,25 +35,16 @@ module.exports = async (app, opts) => {
       logger.info('creating new v1.download message for', id)
       const encoded = proto.encode(downloadProto, payload)
       await amqp.publish('v1.download', encoded)
-      return res.send({
-        success: true,
-        data: obj
-      })
+      return res.success(obj)
     } catch (err) {
       logger.error('failed to requeue', err.message || err)
       logger.error(err.stack)
 
       if (err.code === 'ERRNOTFOUND') {
-        return res.status(404).send({
-          success: false,
-          message: 'ID not found'
-        })
+        return res.error('ID not found', 404)
       }
 
-      return res.status(500).send({
-        success: false,
-        message: 'Failed to update media.'
-      })
+      return res.error('Failed to update media', 500)
     }
   })
 }

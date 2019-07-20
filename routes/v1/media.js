@@ -41,11 +41,7 @@ module.exports = async (app, opts) => {
     }
 
     const formattedMedia = _.map(media, mediaTransformer)
-
-    return res.send({
-      success: true,
-      data: formattedMedia
-    })
+    return res.success(formattedMedia)
   })
 
   // get media by id
@@ -53,44 +49,25 @@ module.exports = async (app, opts) => {
     try {
       const { id } = req.params
       if (!id) {
-        return res.status(400).send({
-          success: false,
-          message: 'Missing ID.'
-        })
+        return res.error('Missing ID in path /:id')
       }
 
       const obj = await db.getByID(req.params['id'])
-      return res.send({
-        success: true,
-        data: mediaTransformer(obj)
-      })
+      return res.success(mediaTransformer(obj))
     } catch (err) {
       logger.error('failed to get media', err.message || err)
       logger.error(err.stack)
 
       if (err.code === 'ERRNOTFOUND') {
-        return res.status(404).send({
-          success: false,
-          message: 'ID not found'
-        })
+        return res.error('Media not found.', 404)
       }
 
-      return res.status(400).send({
-        success: false,
-        message: 'Failed to get media'
-      })
+      return res.error('Failed to get Media', 500)
     }
   })
 
   // TODO(jaredallard): Add a rate limit
   app.post('/', async (req, res) => {
-    const error = (status = 400, msg = 'Internal Server Error') => {
-      return res.status(status).send({
-        success: false,
-        message: msg
-      })
-    }
-
     let { name, creator, creatorId, type, source, sourceURI, metadata, metadataId } = req.body
 
     // TODO(jaredallard): make these less copypasta
@@ -100,7 +77,7 @@ module.exports = async (app, opts) => {
       try {
         creator = proto.stringToEnum(mediaProto, 'CreatorType', creator)
       } catch (err) {
-        return error(400, `Creator '${creator}' not found.`)
+        return res.error(`Creator '${creator}' not found.`)
       }
     }
 
@@ -109,7 +86,7 @@ module.exports = async (app, opts) => {
       try {
         type = proto.stringToEnum(mediaProto, 'MediaType', type)
       } catch (err) {
-        return error(400, `Media Type '${type}' isn't supported.`)
+        return res.error(`Media Type '${type}' isn't supported.`)
       }
     }
 
@@ -118,7 +95,7 @@ module.exports = async (app, opts) => {
       try {
         source = proto.stringToEnum(mediaProto, 'SourceType', source)
       } catch (err) {
-        return error(400, `Source '${source}' isn't supported.`)
+        return res.error(`Source '${source}' isn't supported.`)
       }
     }
 
@@ -127,12 +104,12 @@ module.exports = async (app, opts) => {
       try {
         metadata = proto.stringToEnum(mediaProto, 'MetadataType', metadata)
       } catch (err) {
-        return error(400, `Metadata '${metadata}' isn't supported.`)
+        return res.error(`Metadata '${metadata}' isn't supported.`)
       }
     }
 
     if (creator === 0) {
-      return error(400, 'Trello type is not supported over this endpoint.')
+      return res.error('Trello type is not supported over this endpoint.')
     }
 
     const validationMessage = {
@@ -153,7 +130,7 @@ module.exports = async (app, opts) => {
     } catch (err) {
       logger.error('input failed validation', err.message || err)
       logger.error(validationMessage)
-      return error(400, 'Input failed validation:' + err)
+      return res.error('Input failed validation:' + err)
     }
 
     let encoded
@@ -162,7 +139,7 @@ module.exports = async (app, opts) => {
     } catch (err) {
       logger.error('failed to create media', err.message || err)
       logger.error(err.stack)
-      return error()
+      return res.error('Failed to create media')
     }
 
     try {
@@ -170,16 +147,13 @@ module.exports = async (app, opts) => {
     } catch (err) {
       logger.error('failed to publish to download queue', err.message || err)
       logger.error(err.stack)
-      return error()
+      return res.error('Failed to create media')
     }
 
     const data = await proto.decode(db.downloadProto, encoded, {
       enums: String
     })
 
-    return res.send({
-      success: true,
-      data: data.media
-    })
+    return res.success(data.media)
   })
 }

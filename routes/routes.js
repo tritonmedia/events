@@ -11,6 +11,7 @@ const path = require('path')
 const logger = require('pino')({
   name: path.basename(__filename)
 })
+const os = require('os')
 
 const auth = require('../lib/authentication')
 
@@ -48,6 +49,41 @@ const registerRoutes = async (app, opts) => {
 
     // require authentication
     versionRouter.use(a.requireAuthentication)
+    versionRouter.use((req, res, next) => {
+      const host = os.hostname()
+
+      /**
+       * Send a v1 Error. Evokes res.send
+       *
+       * @param {String} msg error message
+       * @param {Number} statusCode status code to send
+       */
+      res.error = (msg, statusCode = 400) => {
+        return res.status(statusCode).send({
+          metadata: {
+            success: false,
+            error_message: msg,
+            host
+          }
+        })
+      }
+
+      /**
+       * Send a v1 Error. Evokes res.send
+       *
+       * @param {String} msg error message
+       * @param {Number} statusCode status code to send
+       */
+      res.success = data => {
+        return res.status(200).send({
+          metadata: {
+            success: true,
+            host
+          },
+          data
+        })
+      }
+    })
 
     for (const route of routes) {
       const router = new express.Router()

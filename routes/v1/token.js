@@ -13,9 +13,6 @@ module.exports = async (app, opts) => {
   // GET a new token
   app.get('/', async (req, res) => {
     const token = await auth.generateAPIToken()
-    return res.send({
-      success: true,
-      data: token
-    })
+    return res.success(token)
   })
 }
