@@ -157,9 +157,9 @@ module.exports = async (emitter, config, tracer) => {
       return child.error('card was invalid')
     }
 
-    let cardType = 0 // MOVIE
+    let cardType = 1 // MOVIE
     if (!_.find(card.labels, { name: 'Movie' })) {
-      cardType = 1 // TV
+      cardType = 2 // TV
     }
 
     child.info('creating job')
@@ -183,7 +183,7 @@ module.exports = async (emitter, config, tracer) => {
 
       let encoded
       try {
-        encoded = await db.new(card.name, 0, cardId, cardType, source, sourceUrl, metadata, metadataId)
+        encoded = await db.new(card.name, 1, cardId, cardType, source, sourceUrl, metadata, metadataId)
       } catch (err) {
         logger.error('failed to create media', err.message || err)
         logger.error(err.stack)

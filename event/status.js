@@ -77,7 +77,7 @@ module.exports = async (emitter, config, tracer) => {
 
     const media = await db.getByID(mediaId)
 
-    if (media.creator !== 0) {
+    if (media.creator !== 1) {
       return logger.warn('skipping Trello update for non-trello media', mediaId)
     }
 

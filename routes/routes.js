@@ -48,7 +48,6 @@ const registerRoutes = async (app, opts) => {
     const routes = await fs.readdir(path.join(__dirname, version))
 
     // require authentication
-    versionRouter.use(a.requireAuthentication)
     versionRouter.use((req, res, next) => {
       const host = os.hostname()
 
@@ -59,6 +58,7 @@ const registerRoutes = async (app, opts) => {
        * @param {Number} statusCode status code to send
        */
       res.error = (msg, statusCode = 400) => {
+        logger.error(`sending error '${msg}'`)
         return res.status(statusCode).send({
           metadata: {
             success: false,
@@ -83,7 +83,10 @@ const registerRoutes = async (app, opts) => {
           data
         })
       }
+
+      return next()
     })
+    versionRouter.use(a.requireAuthentication)
 
     for (const route of routes) {
       const router = new express.Router()

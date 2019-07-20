@@ -34,10 +34,7 @@ module.exports = async (app, opts) => {
     try {
       media = await db.list()
     } catch (err) {
-      return res.status(500).send({
-        success: false,
-        message: 'Internal Server Error'
-      })
+      return res.error('Internal Server Error', 500)
     }
 
     const formattedMedia = _.map(media, mediaTransformer)
@@ -69,6 +66,12 @@ module.exports = async (app, opts) => {
   // TODO(jaredallard): Add a rate limit
   app.post('/', async (req, res) => {
     let { name, creator, creatorId, type, source, sourceURI, metadata, metadataId } = req.body
+
+    const validate = [
+      creator, type, source, metadata
+    ]
+
+    console.log(req.body)
 
     // TODO(jaredallard): make these less copypasta
     if (typeof creator === 'string') {
@@ -108,8 +111,15 @@ module.exports = async (app, opts) => {
       }
     }
 
-    if (creator === 0) {
+    if (creator === 1) {
       return res.error('Trello type is not supported over this endpoint.')
+    }
+
+    for (const v of validate) {
+      if (v === 0) {
+        res.error(`Cannot set enum value to 0.`, 400)
+        break
+      }
     }
 
     const validationMessage = {

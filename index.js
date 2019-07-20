@@ -60,8 +60,10 @@ const init = async () => {
 
   app.use(async (req, res) => {
     return res.status(404).send({
-      success: false,
-      message: 'Not Found'
+      metadata: {
+        success: false,
+        error_message: 'Not Found'
+      }
     })
   })
 
