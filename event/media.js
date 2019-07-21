@@ -123,7 +123,7 @@ module.exports = async (emitter, config, tracer) => {
     })
 
     const metadataTypes = proto.enumValues(mediaProto, 'MetadataType')
-    logger.info('possible metadata types:', metadataTypes.join(','))
+    child.info('possible metadata types:', metadataTypes.join(','))
 
     let metadata, metadataId
 
@@ -135,18 +135,18 @@ module.exports = async (emitter, config, tracer) => {
 
       if (!attachment) continue
 
-      logger.info('found metadata provider', metadataProvider)
+      child.info('found metadata provider', metadataProvider)
 
       metadata = proto.stringToEnum(mediaProto, 'MetadataType', metadataProvider)
       metadataId = attachment.url
 
       // transform it if we have an available transformer
       if (metadataTransformers[metadataProvider]) {
-        logger.info('executing metadata transformer on value', attachment.url)
+        child.info('executing metadata transformer on value', attachment.url)
         metadataId = metadataTransformers[metadataProvider](attachment.url)
       }
 
-      logger.info('metadata', metadataProvider, 'ID:', metadataId)
+      child.info('metadata', metadataProvider, 'ID:', metadataId)
 
       // we only support one metadata provider
       break
@@ -178,27 +178,29 @@ module.exports = async (emitter, config, tracer) => {
       const sourceUrl = download[2]
       let sourceProtocol = download[1]
 
+      child.info(`media source is type '${sourceProtocol}'`)
+
       // normalize https
       if (sourceProtocol === 'https') sourceProtocol = 'http'
 
       // SourceType is the source enum, we uppercase the value to match what we expect
       const source = proto.stringToEnum(mediaProto, 'SourceType', sourceProtocol.toUpperCase())
 
-      logger.info(`source value '${sourceProtocol}' = '${source}'`)
+      child.info(`source value '${sourceProtocol}' = '${source}'`)
 
       let encoded
       try {
         encoded = await db.new(card.name, 1, cardId, cardType, source, sourceUrl, metadata, metadataId)
       } catch (err) {
-        logger.error('failed to create media', err.message || err)
-        logger.error(err.stack)
+        child.error('failed to create media', err.message || err)
+        child.error(err.stack)
         return
       }
 
       await amqp.publish('v1.download', encoded)
     } catch (err) {
-      child.error('failed to create job')
-      console.log(err)
+      child.error('failed to create job', err.message || err)
+      child.error(err.stack)
     }
 
     child.info('adding labels to certify this card is OK')
