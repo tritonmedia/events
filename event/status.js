@@ -53,27 +53,7 @@ module.exports = async (emitter, config, tracer) => {
       return rmsg.ack()
     }
 
-    let statusText
-    switch (status) {
-      case 0:
-        statusText = 'QUEUED'
-        break
-      case 1:
-        statusText = 'DOWNLOADING'
-        break
-      case 2:
-        statusText = 'CONVERTING'
-        break
-      case 3:
-        statusText = 'UPLOADING'
-        break
-      case 4:
-        statusText = 'DEPLOYED'
-        break
-      case 5:
-        statusText = 'ERRORED'
-        break
-    }
+    const statusText = await proto.enumToString(telemStatusProto, 'TelemetryStatusEntry', status)
 
     const media = await db.getByID(mediaId)
 
