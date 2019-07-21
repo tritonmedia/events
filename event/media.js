@@ -146,15 +146,17 @@ module.exports = async (emitter, config, tracer) => {
         metadataId = metadataTransformers[metadataProvider](attachment.url)
       }
 
+      logger.info('metadata', metadataProvider, 'ID:', metadataId)
+
       // we only support one metadata provider
       break
     }
 
+    console.log(metadataId)
+
     if (!metadataId) {
       return child.error('No metadata found.')
     }
-
-    logger.info(`card is using metadata provider ${proto.enumToString(mediaProto, 'MetadataType', metadata)}, ID ${metadataId}`)
 
     // no download, no source
     if (!download || !source) {
