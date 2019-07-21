@@ -46,6 +46,7 @@ const metadataTransformers = {
     }
 
     metadataId = id.toString(10)
+    return metadataId
   },
   KITSU: data => {
     let metadataId
@@ -58,6 +59,7 @@ const metadataTransformers = {
     }
 
     metadataId = id.toString(10)
+    return metadataId
   }
 }
 
@@ -125,8 +127,6 @@ module.exports = async (emitter, config, tracer) => {
 
     let metadata, metadataId
 
-    logger.info(attachments)
-
     // TODO(jaredallard): move away from attachments and use custom fields or something else
     for (const metadataProvider of metadataTypes) {
       const attachment = _.find(attachments, {
@@ -151,8 +151,6 @@ module.exports = async (emitter, config, tracer) => {
       // we only support one metadata provider
       break
     }
-
-    console.log(metadataId)
 
     if (!metadataId) {
       return child.error('No metadata found.')
