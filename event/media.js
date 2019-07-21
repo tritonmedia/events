@@ -182,6 +182,8 @@ module.exports = async (emitter, config, tracer) => {
 
       // normalize https
       if (sourceProtocol === 'https') sourceProtocol = 'http'
+      // support old notation
+      if (sourceProtocol === 'magnet') sourceProtocol = 'torrent'
 
       // SourceType is the source enum, we uppercase the value to match what we expect
       const source = proto.stringToEnum(mediaProto, 'SourceType', sourceProtocol.toUpperCase())
