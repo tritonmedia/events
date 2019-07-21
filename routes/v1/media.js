@@ -18,8 +18,10 @@ module.exports = async (app, opts) => {
   /**
    * Mutates a media object to have string enum types
    * @param {Object} media media object from the data
+   * @param {Bool} noop do nothing if true
    */
-  const mediaTransformer = media => {
+  const mediaTransformer = (media, noop = false) => {
+    if (noop) return media
     return _.merge(media, {
       creator: proto.enumToString(mediaProto, 'CreatorType', media.creator),
       type: proto.enumToString(mediaProto, 'MediaType', media.creator),
@@ -37,7 +39,7 @@ module.exports = async (app, opts) => {
       return res.error('Internal Server Error', 500)
     }
 
-    const formattedMedia = _.map(media, mediaTransformer)
+    const formattedMedia = _.map(media, (media) => mediaTransformer(media, req.query.enum === 'number'))
     return res.success(formattedMedia)
   })
 
@@ -50,7 +52,7 @@ module.exports = async (app, opts) => {
       }
 
       const obj = await db.getByID(req.params['id'])
-      return res.success(mediaTransformer(obj))
+      return res.success(mediaTransformer(obj, req.query.enum === 'number'))
     } catch (err) {
       logger.error('failed to get media', err.message || err)
       logger.error(err.stack)
@@ -161,7 +163,7 @@ module.exports = async (app, opts) => {
     }
 
     const data = await proto.decode(db.downloadProto, encoded, {
-      enums: String
+      enums: req.query.enum === 'number' ? Number : String
     })
 
     return res.success(data.media)
