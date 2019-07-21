@@ -135,11 +135,14 @@ module.exports = async (emitter, config, tracer) => {
 
       if (!attachment) continue
 
+      logger.info('found metadata provider', metadataProvider)
+
       metadata = proto.stringToEnum(mediaProto, 'MetadataType', metadataProvider)
       metadataId = attachment.url
 
       // transform it if we have an available transformer
       if (metadataTransformers[metadataProvider]) {
+        logger.info('executing metadata transformer on value', attachment.url)
         metadataId = metadataTransformers[metadataProvider](attachment.url)
       }
 
