@@ -125,6 +125,8 @@ module.exports = async (emitter, config, tracer) => {
 
     let metadata, metadataId
 
+    logger.info(attachments)
+
     // TODO(jaredallard): move away from attachments and use custom fields or something else
     for (const metadataProvider of metadataTypes) {
       const attachment = _.find(attachments, {
