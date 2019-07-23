@@ -36,7 +36,6 @@ const metadataTransformers = {
     }
   },
   MAL: data => {
-    let metadataId
     let id = parseInt(data, 10)
     if (isNaN(id)) {
       // attempt to parse it as a URL
@@ -45,11 +44,9 @@ const metadataTransformers = {
       id = parseInt(pathSplit[2], 10)
     }
 
-    metadataId = id.toString(10)
-    return metadataId
+    return id.toString(10)
   },
   KITSU: data => {
-    let metadataId
     let id = parseInt(data, 10)
     if (isNaN(id)) {
       // attempt to parse it as a URL
@@ -58,8 +55,7 @@ const metadataTransformers = {
       id = parseInt(pathSplit[2], 10)
     }
 
-    metadataId = id.toString(10)
-    return metadataId
+    return id.toString(10)
   }
 }
 

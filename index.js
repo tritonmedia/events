@@ -38,7 +38,7 @@ const init = async () => {
   await db.connect()
   Prom.expose()
 
-  let app = express()
+  const app = express()
   app.use(bodyp.json())
   app.get('/v1/health', (req, res) => {
     return res.status(200).send({
