@@ -21,6 +21,8 @@ const dyn = require('triton-core/dynamics')
 const Config = require('triton-core/config')
 const Tracer = require('triton-core/tracer').initTracer
 const Storage = require('triton-core/db')
+const Prom = require('triton-core/prom')
+
 const Auth = require('./lib/authentication')
 
 const tracer = Tracer('events', logger)
@@ -30,9 +32,11 @@ const init = async () => {
   const config = await Config('events')
   const trello = require('./lib/trello')
   const db = new Storage()
-  const amqp = new AMQP(dyn('rabbitmq'))
+  const prom = Prom.new()
+  const amqp = new AMQP(dyn('rabbitmq'), 10000, 2, prom)
   await amqp.connect()
   await db.connect()
+  Prom.expose()
 
   let app = express()
   app.use(bodyp.json())
@@ -83,9 +87,8 @@ const init = async () => {
     logger.info('running with trello support disabled')
   }
 
-  // media events
-  await require('./event/media')(event, config, tracer)
-  await require('./event/status')(event, config, tracer)
+  // DEPRECATED: trello event system
+  await require('./event/media')(event, config, tracer, prom)
 }
 
 init()

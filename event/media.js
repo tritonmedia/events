@@ -69,12 +69,13 @@ const metadataTransformers = {
  * @param  {Event.EventEmitter} emitter event emitter
  * @param  {Object} config              config
  * @param  {opentracing.Tracer} tracer  tracer object
+ * @param  {prom-client} prom prometheus client
  * @return {undefined}                  stop
  */
-module.exports = async (emitter, config, tracer) => {
+module.exports = async (emitter, config, tracer, prom) => {
   const trello = new Trello(config.keys.trello.key, config.keys.trello.token)
 
-  const amqp = new AMQP(dyn('rabbitmq'))
+  const amqp = new AMQP(dyn('rabbitmq'), 1000, 2, prom)
   await amqp.connect()
 
   const db = new Storage()
