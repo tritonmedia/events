@@ -2443,9 +2443,9 @@ trello@^0.9.1:
     restler "~3.3.0"
 
 triton-core@^1.12.3:
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/triton-core/-/triton-core-1.18.0.tgz#79744b6de15b14ba6f46c1c7efcb1817a1962d09"
-  integrity sha512-ep3MdaHRlUC7OCmDvS+aojNYjfU/+tTdystjGq8Dg5y7wSvw4NlCjVgUa4Gc/67XjrYP1JORfstnjwS68FT1og==
+  version "1.18.1"
+  resolved "https://registry.yarnpkg.com/triton-core/-/triton-core-1.18.1.tgz#2b0f0191831768ad3660599182b2d571b194bf9d"
+  integrity sha512-zCmnw9D4I/PzrMK0E018bZmNw+xrh+63d6vk3zxTs01c4hRmbAV/zXYJltXTCNANrCO8f0e9XKRoaUw+ITNfyQ==
   dependencies:
     amqp-connection-manager "^3.0.0"
     amqplib "^0.5.3"
