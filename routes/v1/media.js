@@ -14,6 +14,7 @@ module.exports = async (app, opts) => {
 
   const mediaProto = await proto.load('api.Media')
   const apiProto = await proto.load('api.TelemetryError')
+  const identifyProto = await proto.load('api.Identify')
 
   /**
    * Mutates a media object to have string enum types
@@ -24,9 +25,9 @@ module.exports = async (app, opts) => {
     if (noop) return media
     return _.merge(media, {
       creator: proto.enumToString(mediaProto, 'CreatorType', media.creator),
-      type: proto.enumToString(mediaProto, 'MediaType', media.creator),
-      source: proto.enumToString(mediaProto, 'SourceType', media.creator),
-      metadata: proto.enumToString(mediaProto, 'MetadataType', media.creator),
+      type: proto.enumToString(mediaProto, 'MediaType', media.type),
+      source: proto.enumToString(mediaProto, 'SourceType', media.source),
+      metadata: proto.enumToString(mediaProto, 'MetadataType', media.metadata),
       status: proto.enumToString(apiProto, 'TelemetryStatusEntry', media.status)
     })
   }
@@ -39,7 +40,7 @@ module.exports = async (app, opts) => {
       return res.error('Internal Server Error', 500)
     }
 
-    const formattedMedia = _.map(media, (media) => mediaTransformer(media, req.query.enum === 'number'))
+    const formattedMedia = _.map(media, media => mediaTransformer(media, req.query.enum === 'number'))
     return res.success(formattedMedia)
   })
 
@@ -72,8 +73,6 @@ module.exports = async (app, opts) => {
     const validate = [
       creator, type, source, metadata
     ]
-
-    console.log(req.body)
 
     // TODO(jaredallard): make these less copypasta
     if (typeof creator === 'string') {
@@ -150,6 +149,17 @@ module.exports = async (app, opts) => {
       encoded = await db.new(name, creator, creatorId, type, source, sourceURI, metadata, metadataId)
     } catch (err) {
       logger.error('failed to create media', err.message || err)
+      logger.error(err.stack)
+      return res.error('Failed to create media')
+    }
+
+    // TODO(jaredallard): get rid of db.new returning a fixed proto
+    try {
+      const payload = await proto.decode(db.downloadProto, encoded)
+      const encodedIdentify = proto.encode(identifyProto, payload)
+      await amqp.publish('v1.identify', encodedIdentify)
+    } catch (err) {
+      logger.error('failed to publish to identify queue', err.message || err)
       logger.error(err.stack)
       return res.error('Failed to create media')
     }

@@ -14,6 +14,7 @@ const logger = require('pino')({
 module.exports = async (app, opts) => {
   const { db, amqp } = opts
   const downloadProto = await proto.load('api.Download')
+  const identifyProto = await proto.load('api.Identify')
 
   // requeue media by id
   app.post('/:id', async (req, res) => {
@@ -35,6 +36,9 @@ module.exports = async (app, opts) => {
       logger.info('creating new v1.download message for', id)
       const encoded = proto.encode(downloadProto, payload)
       await amqp.publish('v1.download', encoded)
+
+      const encodedIdentify = proto.encode(identifyProto, payload)
+      await amqp.publish('v1.identify', encodedIdentify)
       return res.success(obj)
     } catch (err) {
       logger.error('failed to requeue', err.message || err)
