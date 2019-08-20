@@ -23,7 +23,7 @@ module.exports = async (app, opts) => {
   app.get('/:seriesid/files/:episodeid', async (req, res) => {
     let media
     try {
-      media = await db.getEpisodeFiles(req.params.seriesid)
+      media = await db.getEpisodeFiles(req.params.episodeid)
     } catch (err) {
       return res.error('Internal Server Error', 500)
     }

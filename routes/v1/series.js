@@ -24,6 +24,23 @@ module.exports = async (app, opts) => {
   })
 
   /**
+   * GET / - list all series
+   */
+  app.get('/', async (req, res) => {
+    let media
+    try {
+      media = await db.listSeries()
+    } catch (err) {
+      return res.error('Internal Server Error', 500)
+    }
+
+    if (media.length === 0) {
+      return res.error('Not Found', 404)
+    }
+    return res.success(media)
+  })
+
+  /**
    * GET /:id/images - return a list of images for a series
    */
   app.get('/:id/images', async (req, res) => {
