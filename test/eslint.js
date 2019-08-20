@@ -3,6 +3,8 @@ const lint = require('mocha-eslint')
 const paths = [
   'lib/*.js',
   'event/*.js',
+  'routes/*.js',
+  'routes/**/*.js',
   '*.js',
   '!tests/*'
 ]

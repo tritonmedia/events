@@ -52,7 +52,7 @@ module.exports = async (app, opts) => {
         return res.error('Missing ID in path /:id')
       }
 
-      const obj = await db.getByID(req.params['id'])
+      const obj = await db.getByID(req.params.id)
       return res.success(mediaTransformer(obj, req.query.enum === 'number'))
     } catch (err) {
       logger.error('failed to get media', err.message || err)
@@ -118,7 +118,7 @@ module.exports = async (app, opts) => {
 
     for (const v of validate) {
       if (v === 0) {
-        res.error(`Cannot set enum value to 0.`, 400)
+        res.error('Cannot set enum value to 0.', 400)
         break
       }
     }
