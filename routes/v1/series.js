@@ -7,9 +7,10 @@ const logger = require('pino')({
   name: path.basename(__filename)
 })
 const proto = require('triton-core/proto')
+const Minio = require('triton-core/minio')
 
 module.exports = async (app, opts) => {
-  const { db } = opts
+  const { db, s3Client } = opts
 
   const mediaProto = await proto.load('api.Media')
 
@@ -56,6 +57,13 @@ module.exports = async (app, opts) => {
       logger.error(err.stack)
       return res.error('Internal Server Error', 500)
     }
+
+    for (const item of media) {
+      for (const img of item.images) {
+        img.url = await Minio.presignedURL(s3Client, 'triton-media', `images/${item.id}/${img.id}.png`)
+      }
+    }
+
     return res.success(media)
   })
 

@@ -6,9 +6,10 @@ const path = require('path')
 const logger = require('pino')({
   name: path.basename(__filename)
 })
+const Minio = require('triton-core/minio')
 
 module.exports = async (app, opts) => {
-  const { db } = opts
+  const { db, s3Client } = opts
 
   app.get('/:id', async (req, res) => {
     let media
@@ -39,6 +40,10 @@ module.exports = async (app, opts) => {
 
     if (media.length === 0) {
       return res.error('Not Found', 404)
+    }
+
+    for (const item of media) {
+      item.url = await Minio.presignedURL(s3Client, 'triton-media', item.key)
     }
 
     return res.success(media)

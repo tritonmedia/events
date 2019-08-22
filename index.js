@@ -22,6 +22,7 @@ const Config = require('triton-core/config')
 const Tracer = require('triton-core/tracer').initTracer
 const Storage = require('triton-core/db')
 const Prom = require('triton-core/prom')
+const Minio = require('triton-core/minio')
 
 const Auth = require('./lib/authentication')
 
@@ -57,6 +58,7 @@ const init = async () => {
   // intialize the routes
   await require('./routes/routes')(app, {
     db,
+    s3Client: Minio.newClient(config),
     amqp,
     emitter: event,
     tracer

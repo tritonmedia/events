@@ -12,6 +12,7 @@ const logger = require('pino')({
   name: path.basename(__filename)
 })
 const os = require('os')
+const cors = require('cors')
 
 const auth = require('../lib/authentication')
 
@@ -86,6 +87,7 @@ const registerRoutes = async (app, opts) => {
 
       return next()
     })
+    versionRouter.use(cors())
     versionRouter.use(a.requireAuthentication)
 
     for (const route of routes) {
