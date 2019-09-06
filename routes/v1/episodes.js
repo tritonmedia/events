@@ -25,6 +25,10 @@ module.exports = async (app, opts) => {
       return res.error('Not Found', 404)
     }
 
+    for (const item of media) {
+      item.thumbnail_url = await Minio.presignedURL(s3Client, 'triton-media', `images/${item.media_id}/${item.thumbnail_image_id}.png`)
+    }
+
     return res.success(media)
   })
 
