@@ -15,7 +15,7 @@
     "crypto-random-string": "^3.0.1",
     "express": "^4.17.1",
     "fs-extra": "^8.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "pino": "^5.13.2",
     "trello": "^0.9.1",
     "triton-core": "^1.22.0",
